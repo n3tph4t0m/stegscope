@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StegScope — analyse d'images & stéganographie</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'] } } }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-200 font-mono antialiased">
+  <div class="mx-auto max-w-5xl px-4 py-10">
+    <header class="mb-10">
+      <h1 class="text-2xl font-semibold tracking-tight text-emerald-400">StegScope</h1>
+      <p class="mt-1 text-sm text-slate-400">Analyse d'images et stéganographie — orienté CTF.</p>
+    </header>
+
+    <section id="dropzone"
+             class="rounded-xl border-2 border-dashed border-slate-700 bg-slate-900/40 p-10 text-center transition hover:border-emerald-500/60">
+      <input id="file" type="file" class="hidden"
+             accept=".png,.jpg,.jpeg,.gif,.bmp,.webp,.tiff,.tif">
+      <p class="text-slate-300">Dépose une image ou
+        <button id="pick" class="text-emerald-400 underline underline-offset-4">parcours tes fichiers</button>.
+      </p>
+      <p class="mt-2 text-xs text-slate-500">PNG, JPG, GIF, BMP, WEBP, TIFF — 16 Mo max.</p>
+    </section>
+
+    <div id="meta" class="mt-6 hidden items-center justify-between rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm">
+      <span id="meta-name" class="truncate text-slate-200"></span>
+      <span id="meta-size" class="text-slate-500"></span>
+    </div>
+
+    <div id="status" class="mt-6 hidden text-sm text-emerald-400">Analyse en cours…</div>
+    <div id="error" class="mt-6 hidden rounded-lg border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-300"></div>
+
+    <div id="results" class="mt-8 space-y-4"></div>
+
+    <footer class="mt-16 border-t border-slate-800 pt-6 text-xs text-slate-600">
+      Usage légal uniquement : CTF, labs et fichiers dont vous disposez des droits.
+    </footer>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
