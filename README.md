@@ -5,6 +5,15 @@ alternative minimaliste et rapide à Aperi'Solve : on dépose une image, le
 serveur enchaîne les outils d'analyse habituels et renvoie un rapport lisible,
 avec mise en évidence des motifs de type flag.
 
+## Démarrage rapide
+
+```bash
+./start.sh
+```
+
+Crée l'environnement, installe les dépendances au premier lancement, puis sert
+l'interface sur http://127.0.0.1:5000.
+
 ## Fonctionnalités
 
 - Dépôt par glisser-déposer ou sélection de fichier.
