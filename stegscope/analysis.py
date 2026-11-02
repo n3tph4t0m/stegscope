@@ -53,7 +53,7 @@ def _capture(args: list[str], timeout: int) -> tuple[int, str]:
 def _trim(text: str) -> str:
     if len(text) <= MAX_OUTPUT:
         return text
-    return text[:MAX_OUTPUT] + f"\n... (sortie tronquée, {len(text)} octets au total)"
+    return text[:MAX_OUTPUT] + f"\n... (output truncated, {len(text)} bytes total)"
 
 
 def _simple_runner(binary: str, extra: list[str]):
@@ -62,9 +62,9 @@ def _simple_runner(binary: str, extra: list[str]):
         try:
             code, out = _capture([binary, *extra, str(path)], timeout)
         except subprocess.TimeoutExpired:
-            return Result("timeout", f"Dépassement du délai ({timeout}s).")
+            return Result("timeout", f"Timed out after {timeout}s.")
         status = "ok" if code == 0 or out else "empty"
-        return Result(status, _trim(out) or "Aucune sortie.", duration=time.perf_counter() - start)
+        return Result(status, _trim(out) or "No output.", duration=time.perf_counter() - start)
 
     return run
 
@@ -74,7 +74,7 @@ def _strings_runner(path: Path, timeout: int) -> Result:
     try:
         code, out = _capture(["strings", "-n", "6", str(path)], timeout)
     except subprocess.TimeoutExpired:
-        return Result("timeout", f"Dépassement du délai ({timeout}s).")
+        return Result("timeout", f"Timed out after {timeout}s.")
 
     lines = out.splitlines()
     flags = sorted({m.group(0) for line in lines for m in FLAG_PATTERN.finditer(line)})
@@ -82,13 +82,13 @@ def _strings_runner(path: Path, timeout: int) -> Result:
 
     blocks = []
     if flags:
-        blocks.append("### Motifs de type flag\n" + "\n".join(flags))
+        blocks.append("### Flag-like patterns\n" + "\n".join(flags))
     if keywords:
         blocks.append(
-            "### Lignes sensibles\n" + "\n".join(dict.fromkeys(keywords[:200]))
+            "### Sensitive lines\n" + "\n".join(dict.fromkeys(keywords[:200]))
         )
     if not blocks:
-        blocks.append(f"Aucun motif notable parmi {len(lines)} chaînes extraites.")
+        blocks.append(f"No notable pattern among {len(lines)} extracted strings.")
 
     return Result(
         "ok",
@@ -101,37 +101,37 @@ def _strings_runner(path: Path, timeout: int) -> Result:
 TOOLS: list[Tool] = [
     Tool(
         "file",
-        "Type de fichier",
+        "File type",
         "file",
-        "Identifie le format réel indépendamment de l'extension.",
+        "Identifies the real format regardless of the extension.",
         _simple_runner("file", []),
     ),
     Tool(
         "exiftool",
-        "Métadonnées",
+        "Metadata",
         "exiftool",
-        "Extrait les métadonnées EXIF, commentaires et champs cachés.",
+        "Extracts EXIF metadata, comments and hidden fields.",
         _simple_runner("exiftool", ["-a", "-u", "-g1"]),
     ),
     Tool(
         "strings",
-        "Chaînes (filtrées CTF)",
+        "Strings (CTF-filtered)",
         "strings",
-        "Recherche les motifs de flag et les lignes sensibles.",
+        "Searches for flag-like patterns and sensitive lines.",
         _strings_runner,
     ),
     Tool(
         "binwalk",
-        "Fichiers embarqués",
+        "Embedded files",
         "binwalk",
-        "Détecte les signatures de fichiers ou archives dissimulés.",
+        "Detects signatures of hidden files or archives.",
         _simple_runner("binwalk", []),
     ),
     Tool(
         "zsteg",
         "LSB (PNG/BMP)",
         "zsteg",
-        "Analyse les plans de bits de poids faible des images PNG et BMP.",
+        "Analyses the least-significant bit planes of PNG and BMP images.",
         _simple_runner("zsteg", ["-a"]),
         extensions={"png", "bmp"},
     ),
@@ -147,9 +147,9 @@ def run_all(path: Path, ext: str, timeout: int) -> list[dict]:
             "description": tool.description,
         }
         if not tool.available():
-            entry.update(status="unavailable", output=f"{tool.binary} n'est pas installé sur le serveur.")
+            entry.update(status="unavailable", output=f"{tool.binary} is not installed on the server.")
         elif not tool.supports(ext):
-            entry.update(status="skipped", output=f"Non applicable au format .{ext}.")
+            entry.update(status="skipped", output=f"Not applicable to .{ext} files.")
         else:
             result = tool.runner(path, timeout)
             entry.update(

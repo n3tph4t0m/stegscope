@@ -10,14 +10,14 @@ const results = document.getElementById("results");
 
 const LABELS = {
   ok: "ok",
-  empty: "vide",
-  skipped: "ignoré",
-  unavailable: "indisponible",
+  empty: "empty",
+  skipped: "skipped",
+  unavailable: "unavailable",
   timeout: "timeout",
 };
 
 function humanSize(bytes) {
-  const units = ["o", "Ko", "Mo"];
+  const units = ["B", "KB", "MB"];
   let value = bytes;
   let unit = 0;
   while (value >= 1024 && unit < units.length - 1) {
@@ -72,7 +72,7 @@ async function analyze(file) {
   try {
     const res = await fetch("/api/analyze", { method: "POST", body });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Erreur serveur.");
+    if (!res.ok) throw new Error(data.error || "Server error.");
     metaSize.textContent = humanSize(data.size);
     results.innerHTML = data.report.map(card).join("");
   } catch (err) {

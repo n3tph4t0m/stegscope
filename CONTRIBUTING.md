@@ -1,9 +1,9 @@
-# Contribuer à StegScope
+# Contributing to StegScope
 
-Merci de votre intérêt. Ce projet reste volontairement simple ; toute
-contribution qui préserve cette lisibilité est la bienvenue.
+Thanks for your interest. This project is intentionally simple; any contribution
+that preserves that readability is welcome.
 
-## Mettre en place l'environnement
+## Setting up the environment
 
 ```bash
 git clone https://github.com/qkjhdflj/stegscope.git
@@ -14,34 +14,34 @@ pip install -r requirements.txt
 python run.py
 ```
 
-## Ajouter un outil d'analyse
+## Adding an analysis tool
 
-Le moteur repose sur un registre déclaratif dans `stegscope/analysis.py`. Pour
-brancher un nouvel outil, ajoutez une entrée `Tool` à la liste `TOOLS` :
+The engine is driven by a declarative registry in `stegscope/analysis.py`. To
+wire in a new tool, add a `Tool` entry to the `TOOLS` list:
 
 ```python
 Tool(
     "foremost",
     "Carving",
     "foremost",
-    "Récupère les fichiers par signature.",
+    "Recovers files by signature.",
     _simple_runner("foremost", ["-T"]),
-    extensions={"png", "jpg", "bmp"},  # optionnel
+    extensions={"png", "jpg", "bmp"},  # optional
 )
 ```
 
-- `available()` détecte automatiquement l'absence du binaire via `shutil.which`.
-- Les appels passent par `subprocess` sans shell, avec un timeout.
-- Pour un traitement sur mesure, écrivez une fonction `runner(path, timeout) -> Result`
-  sur le modèle de `_strings_runner`.
+- `available()` automatically detects a missing binary via `shutil.which`.
+- Calls go through `subprocess` without a shell, with a timeout.
+- For custom handling, write a `runner(path, timeout) -> Result` function
+  modelled on `_strings_runner`.
 
 ## Style
 
-- Code lisible, sans commentaire superflu.
-- Pas de dépendance ajoutée sans nécessité réelle.
+- Readable code, no superfluous comments.
+- No dependency added without a real need.
 
-## Proposer un changement
+## Proposing a change
 
-1. Créez une branche dédiée.
-2. Vérifiez que l'application démarre et qu'une analyse aboutit.
-3. Ouvrez une pull request décrivant le besoin et la solution.
+1. Create a dedicated branch.
+2. Check that the application starts and that an analysis completes.
+3. Open a pull request describing the need and the solution.

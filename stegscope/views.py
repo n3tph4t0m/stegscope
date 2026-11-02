@@ -31,12 +31,12 @@ def index():
 def analyze():
     upload = request.files.get("image")
     if upload is None or not upload.filename:
-        return jsonify(error="Aucun fichier fourni."), 400
+        return jsonify(error="No file provided."), 400
 
     filename = secure_filename(upload.filename)
     if not _allowed(filename):
         allowed = ", ".join(sorted(current_app.config["ALLOWED_EXTENSIONS"]))
-        return jsonify(error=f"Extension non autorisée. Formats acceptés : {allowed}."), 400
+        return jsonify(error=f"Extension not allowed. Accepted formats: {allowed}."), 400
 
     ext = filename.rsplit(".", 1)[1].lower()
     workdir = Path(tempfile.mkdtemp(dir=current_app.config["UPLOAD_FOLDER"]))

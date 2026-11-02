@@ -2,35 +2,36 @@
 
 # StegScope
 
-**Analyse d'images et stéganographie en self-hosted, pensée pour le CTF.**
+**Self-hosted image analysis and steganography, built for CTF.**
 
-Une alternative minimaliste et rapide à Aperi'Solve : déposez une image, le
-serveur enchaîne les outils d'analyse habituels et renvoie un rapport lisible,
-avec mise en évidence des motifs de type flag.
+A minimalist, fast alternative to Aperi'Solve: drop an image, the server chains
+the usual analysis tools and returns a readable report, highlighting flag-like
+patterns along the way.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.x-black?style=flat-square&logo=flask&logoColor=white)
-![Status](https://img.shields.io/badge/status-actif-brightgreen?style=flat-square)
+![Status](https://img.shields.io/badge/status-active-brightgreen?style=flat-square)
 
 </div>
 
 ---
 
-## Aperçu
+## Overview
 
-StegScope expose une interface web sombre où l'on dépose une image. En arrière-plan,
-un serveur Flask exécute une batterie d'outils d'analyse dans un environnement isolé,
-agrège les résultats et surligne automatiquement les chaînes ressemblant à un flag.
+StegScope exposes a dark web interface where you drop an image. In the
+background, a Flask server runs a battery of analysis tools in an isolated
+environment, aggregates the results and automatically highlights strings that
+look like a flag.
 
 ```
 ┌──────────────┐   upload    ┌───────────────┐   subprocess   ┌──────────────────────────┐
-│  Navigateur  │ ──────────▶ │  Flask (API)  │ ─────────────▶ │ file · exiftool · strings │
+│   Browser    │ ──────────▶ │  Flask (API)  │ ─────────────▶ │ file · exiftool · strings │
 │  (dark UI)   │ ◀────────── │  /api/analyze │ ◀───────────── │ binwalk · zsteg           │
-└──────────────┘   rapport   └───────────────┘    résultats   └──────────────────────────┘
+└──────────────┘   report    └───────────────┘    results     └──────────────────────────┘
 ```
 
-## Démarrage rapide
+## Quick start
 
 ```bash
 git clone https://github.com/qkjhdflj/stegscope.git
@@ -38,42 +39,42 @@ cd stegscope
 ./start.sh
 ```
 
-`start.sh` crée l'environnement virtuel, installe les dépendances au premier
-lancement puis sert l'interface sur **http://127.0.0.1:5000**.
+`start.sh` creates the virtual environment, installs the dependencies on first
+run, then serves the interface at **http://127.0.0.1:5000**.
 
-## Fonctionnalités
+## Features
 
-- Dépôt par glisser-déposer ou sélection de fichier.
-- Enchaînement automatique de `file`, `exiftool`, `strings`, `binwalk` et `zsteg`.
-- Filtrage des chaînes sur les motifs de flag (`xxx{...}`) et les lignes sensibles.
-- Détection des outils absents sur le serveur, signalés sans interrompre l'analyse.
-- Interface sombre épurée, upload validé et travail en répertoire temporaire isolé.
+- Upload by drag-and-drop or file picker.
+- Automatic chaining of `file`, `exiftool`, `strings`, `binwalk` and `zsteg`.
+- String filtering on flag patterns (`xxx{...}`) and sensitive lines.
+- Detection of tools missing on the server, reported without aborting the analysis.
+- Clean dark interface, validated upload and work in an isolated temporary directory.
 
-## Stack technique
+## Tech stack
 
-| Couche | Technologies |
+| Layer | Technologies |
 |---|---|
-| Backend | Python 3, Flask, `subprocess` (sans shell, avec timeout) |
-| Analyse | `file`, `exiftool`, `strings`, `binwalk`, `zsteg` |
-| Frontend | HTML5, Tailwind CSS (CDN), JavaScript natif — aucune étape de build |
+| Backend | Python 3, Flask, `subprocess` (no shell, with timeout) |
+| Analysis | `file`, `exiftool`, `strings`, `binwalk`, `zsteg` |
+| Frontend | HTML5, Tailwind CSS (CDN), vanilla JavaScript — no build step |
 
-## Prérequis
+## Requirements
 
-Python 3.10 ou supérieur, et les outils d'analyse accessibles dans le `PATH`.
+Python 3.10 or later, and the analysis tools available in the `PATH`.
 
 ```bash
 # Debian / Ubuntu / Kali
 sudo apt install exiftool binwalk file binutils
-# zsteg (gem Ruby)
+# zsteg (Ruby gem)
 sudo gem install zsteg
 ```
 
-Les outils absents ne bloquent pas l'application : ils apparaissent comme
-« indisponible » dans le rapport.
+Missing tools do not block the application: they appear as "unavailable" in the
+report.
 
-## Installation manuelle
+## Manual installation
 
-Si vous préférez ne pas utiliser `start.sh` :
+If you prefer not to use `start.sh`:
 
 ```bash
 python3 -m venv .venv
@@ -84,49 +85,49 @@ python run.py
 
 ## Configuration
 
-Réglable par variables d'environnement :
+Adjustable through environment variables:
 
-| Variable | Rôle | Défaut |
+| Variable | Purpose | Default |
 |---|---|---|
-| `STEGSCOPE_SECRET` | Clé de session Flask | aléatoire |
-| `STEGSCOPE_UPLOADS` | Répertoire de travail | `./uploads` |
-| `STEGSCOPE_MAX_BYTES` | Taille maximale d'un upload | `16777216` (16 Mo) |
-| `STEGSCOPE_TIMEOUT` | Délai par outil, en secondes | `25` |
+| `STEGSCOPE_SECRET` | Flask session key | random |
+| `STEGSCOPE_UPLOADS` | Working directory | `./uploads` |
+| `STEGSCOPE_MAX_BYTES` | Maximum upload size | `16777216` (16 MB) |
+| `STEGSCOPE_TIMEOUT` | Per-tool timeout, in seconds | `25` |
 
-## Utilisation
+## Usage
 
-1. Ouvrir l'interface et déposer une image (PNG, JPG, GIF, BMP, WEBP, TIFF).
-2. Chaque outil produit une carte de résultat ; les motifs de flag détectés sont
-   mis en évidence en haut de la carte `strings`.
-3. Le fichier est supprimé du serveur dès l'analyse terminée.
+1. Open the interface and drop an image (PNG, JPG, GIF, BMP, WEBP, TIFF).
+2. Each tool produces a result card; detected flag patterns are highlighted at
+   the top of the `strings` card.
+3. The file is deleted from the server as soon as the analysis finishes.
 
-## Structure du projet
+## Project layout
 
 ```
 stegscope/
-├── run.py                   point d'entrée
-├── start.sh                 lanceur (venv + install + run)
+├── run.py                   entry point
+├── start.sh                 launcher (venv + install + run)
 ├── requirements.txt
 └── stegscope/
     ├── __init__.py          application factory
-    ├── config.py            configuration par variables d'environnement
-    ├── analysis.py          moteur d'analyse (registre d'outils)
-    ├── views.py             routes et API
+    ├── config.py            configuration via environment variables
+    ├── analysis.py          analysis engine (tool registry)
+    ├── views.py             routes and API
     ├── templates/index.html interface
-    └── static/app.js        logique front
+    └── static/app.js        front-end logic
 ```
 
-## Contribuer
+## Contributing
 
-Les contributions sont bienvenues. Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour
-ajouter un outil d'analyse ou proposer une amélioration.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) to add an
+analysis tool or propose an improvement.
 
-## Sécurité
+## Security
 
-StegScope exécute des binaires d'analyse sur les fichiers fournis. À héberger sur
-une machine de confiance et à utiliser uniquement sur des fichiers dont vous
-disposez des droits : CTF, laboratoires et environnements autorisés.
+StegScope runs analysis binaries on the files you provide. Host it on a trusted
+machine and use it only on files you are authorised to analyse: CTF, labs and
+permitted environments.
 
-## Licence
+## License
 
-Distribué sous licence MIT. Voir [LICENSE](LICENSE).
+Released under the MIT License. See [LICENSE](LICENSE).
